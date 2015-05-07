@@ -26,6 +26,8 @@
 #include "../360Controller/ControlStruct.h"
 #include "../360Controller/xbox360hid.h"
 
+#define COMBINED_TRIGGER_AXIS true
+
 #define kDriverSettingKey "DeviceData"
 
 OSDefineMetaClassAndStructors(Wireless360Controller, WirelessHIDDevice)
@@ -141,6 +143,14 @@ void Wireless360Controller::fiddleReport(unsigned char *data, int length)
             if (getAbsolute(report->right.y) < deadzoneRight)
                 report->right.y = 0;
         }
+    }
+    
+    if (COMBINED_TRIGGER_AXIS) // TODO: make this a user setting in the UI
+    {
+        // set only the left trigger axis as a combined value, zero out the right trigger axis
+        const UInt8 trigCenter = UINT8_MAX / 2U;
+        report->trigL = trigCenter + ((report->trigR/2U + 1) - report->trigL/2U);
+        report->trigR = 0U;
     }
 }
 
