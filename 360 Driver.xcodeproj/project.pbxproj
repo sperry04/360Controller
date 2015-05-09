@@ -221,6 +221,7 @@
 		3FE789AF1A70331C00FF4065 /* MyTrigger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTrigger.m; sourceTree = "<group>"; };
 		4A2EFF201AFD3FED00A33737 /* ControllerSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControllerSettings.cpp; sourceTree = "<group>"; };
 		4A2EFF211AFD3FED00A33737 /* ControllerSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerSettings.h; sourceTree = "<group>"; };
+		4AD064C71AFDC8370071F97E /* DeveloperSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = DeveloperSettings.xcconfig; sourceTree = "<group>"; };
 		551B911F1A68BDB000EA6527 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/Pref360ControlPref.xib; sourceTree = "<group>"; };
 		551CDFFD196EF52F000869B6 /* Pref360Control_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pref360Control_Prefix.pch; sourceTree = "<group>"; };
 		551CDFFF196EFD34000869B6 /* Install360Controller.pkgproj */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Install360Controller.pkgproj; sourceTree = "<group>"; };
@@ -486,6 +487,7 @@
 		55B636AB18C104DB00CE933D = {
 			isa = PBXGroup;
 			children = (
+				4AD064C71AFDC8370071F97E /* DeveloperSettings.xcconfig */,
 				4A2EFF1C1AFD3BBF00A33737 /* ControllerSettings */,
 				55B6372C18C108D200CE933D /* Feedback360 */,
 				55B636EB18C1054F00CE933D /* 360Controller */,
@@ -1187,6 +1189,7 @@
 /* Begin XCBuildConfiguration section */
 		55B636E318C104DB00CE933D /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4AD064C71AFDC8370071F97E /* DeveloperSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -1234,6 +1237,7 @@
 		};
 		55B636E418C104DB00CE933D /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 4AD064C71AFDC8370071F97E /* DeveloperSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -1248,7 +1252,6 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "3rd Party Mac Developer Application";
 				COMBINE_HIDPI_IMAGES = YES;
 				COPY_PHASE_STRIP = YES;
 				CURRENT_PROJECT_VERSION = 1.0.0d15;
