@@ -158,6 +158,12 @@ xcuserdata
 *.moved-aside
 
 ####
+# DeveloperSettings.xcconfig should be used to store per-developer code signing info
+# see: http://stackoverflow.com/questions/331287/iphone-xcode-project-pbxproj-subversion-code-signing-issue/333177#333177
+
+DeveloperSettings.xcconfig
+
+####
 # UNKNOWN: recommended by others, but I can't discover what these files are
 #
 # ...none. Everything is now explained.
