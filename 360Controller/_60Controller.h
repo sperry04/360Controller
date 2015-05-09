@@ -26,6 +26,7 @@
 #include <IOKit/hid/IOHIDDevice.h>
 #include <IOKit/usb/IOUSBDevice.h>
 #include <IOKit/usb/IOUSBInterface.h>
+#include "../ControllerSettings/ControllerSettings.h"
 
 class Xbox360ControllerClass;
 class ChatPadKeyboardClass;
@@ -35,6 +36,7 @@ class Xbox360Peripheral : public IOService
     OSDeclareDefaultStructors(Xbox360Peripheral)
 
 private:
+    
     void ReleaseAll(void);
     bool QueueRead(void);
 	bool QueueSerialRead(void);
@@ -62,6 +64,7 @@ private:
 	void SerialMessage(IOBufferMemoryDescriptor *data, size_t length);
 
 protected:
+    
 	typedef enum TIMER_STATE {
 		tsToggle,
 		tsReset1,
@@ -98,20 +101,12 @@ protected:
 	Xbox360ControllerClass *padHandler;
     UInt8 chatpadInit[2];
     CONTROLLER_TYPE controllerType;
-
-    // Settings
-    bool invertLeftX,invertLeftY;
-    bool invertRightX,invertRightY;
-    short deadzoneLeft,deadzoneRight;
-    bool relativeLeft,relativeRight;
-    bool deadOffLeft, deadOffRight;
     
 public:
-    // Controller specific
-    UInt8 xoneRumbleType;
 
-    UInt8 mapping[15];
-    
+    // Settings
+    ControllerSettings *settings;
+
     // this is from the IORegistryEntry - no provider yet
     virtual bool init(OSDictionary *propTable);
     virtual void free(void);

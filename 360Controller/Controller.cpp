@@ -225,26 +225,43 @@ OSNumber* Xbox360ControllerClass::newLocationIDNumber() const
 
 void Xbox360ControllerClass::remapButtons(void *buffer)
 {
+    if (GetOwner(this)->settings == NULL) return;
+    
     XBOX360_IN_REPORT *report360 = (XBOX360_IN_REPORT*)buffer;
     UInt16 new_buttons = 0;
 
-    new_buttons |= ((report360->buttons & 1) == 1) << GetOwner(this)->mapping[0];
-    new_buttons |= ((report360->buttons & 2) == 2) << GetOwner(this)->mapping[1];
-    new_buttons |= ((report360->buttons & 4) == 4) << GetOwner(this)->mapping[2];
-    new_buttons |= ((report360->buttons & 8) == 8) << GetOwner(this)->mapping[3];
-    new_buttons |= ((report360->buttons & 16) == 16) << GetOwner(this)->mapping[4];
-    new_buttons |= ((report360->buttons & 32) == 32) << GetOwner(this)->mapping[5];
-    new_buttons |= ((report360->buttons & 64) == 64) << GetOwner(this)->mapping[6];
-    new_buttons |= ((report360->buttons & 128) == 128) << GetOwner(this)->mapping[7];
-    new_buttons |= ((report360->buttons & 256) == 256) << GetOwner(this)->mapping[8];
-    new_buttons |= ((report360->buttons & 512) == 512) << GetOwner(this)->mapping[9];
-    new_buttons |= ((report360->buttons & 1024) == 1024) << GetOwner(this)->mapping[10];
-    new_buttons |= ((report360->buttons & 4096) == 4096) << GetOwner(this)->mapping[11];
-    new_buttons |= ((report360->buttons & 8192) == 8192) << GetOwner(this)->mapping[12];
-    new_buttons |= ((report360->buttons & 16384) == 16384) << GetOwner(this)->mapping[13];
-    new_buttons |= ((report360->buttons & 32768) == 32768) << GetOwner(this)->mapping[14];
+    new_buttons |= ((report360->buttons & 1) == 1) << GetOwner(this)->settings->mapping[0];
+    new_buttons |= ((report360->buttons & 2) == 2) << GetOwner(this)->settings->mapping[1];
+    new_buttons |= ((report360->buttons & 4) == 4) << GetOwner(this)->settings->mapping[2];
+    new_buttons |= ((report360->buttons & 8) == 8) << GetOwner(this)->settings->mapping[3];
+    new_buttons |= ((report360->buttons & 16) == 16) << GetOwner(this)->settings->mapping[4];
+    new_buttons |= ((report360->buttons & 32) == 32) << GetOwner(this)->settings->mapping[5];
+    new_buttons |= ((report360->buttons & 64) == 64) << GetOwner(this)->settings->mapping[6];
+    new_buttons |= ((report360->buttons & 128) == 128) << GetOwner(this)->settings->mapping[7];
+    new_buttons |= ((report360->buttons & 256) == 256) << GetOwner(this)->settings->mapping[8];
+    new_buttons |= ((report360->buttons & 512) == 512) << GetOwner(this)->settings->mapping[9];
+    new_buttons |= ((report360->buttons & 1024) == 1024) << GetOwner(this)->settings->mapping[10];
+    new_buttons |= ((report360->buttons & 4096) == 4096) << GetOwner(this)->settings->mapping[11];
+    new_buttons |= ((report360->buttons & 8192) == 8192) << GetOwner(this)->settings->mapping[12];
+    new_buttons |= ((report360->buttons & 16384) == 16384) << GetOwner(this)->settings->mapping[13];
+    new_buttons |= ((report360->buttons & 32768) == 32768) << GetOwner(this)->settings->mapping[14];
     
-//    IOLog("BUTTON PACKET - %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n", GetOwner(this)->mapping[0], GetOwner(this)->mapping[1], GetOwner(this)->mapping[2], GetOwner(this)->mapping[3], GetOwner(this)->mapping[4], GetOwner(this)->mapping[5], GetOwner(this)->mapping[6], GetOwner(this)->mapping[7], GetOwner(this)->mapping[8], GetOwner(this)->mapping[9], GetOwner(this)->mapping[10], GetOwner(this)->mapping[11], GetOwner(this)->mapping[12], GetOwner(this)->mapping[13], GetOwner(this)->mapping[14]);
+//    IOLog("BUTTON PACKET - %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d, %d\n",
+//          GetOwner(this)->settings->mapping[0],
+//          GetOwner(this)->settings->mapping[1],
+//          GetOwner(this)->settings->mapping[2],
+//          GetOwner(this)->settings->mapping[3],
+//          GetOwner(this)->settings->mapping[4],
+//          GetOwner(this)->settings->mapping[5],
+//          GetOwner(this)->settings->mapping[6],
+//          GetOwner(this)->settings->mapping[7],
+//          GetOwner(this)->settings->mapping[8],
+//          GetOwner(this)->settings->mapping[9],
+//          GetOwner(this)->settings->mapping[10],
+//          GetOwner(this)->settings->mapping[11],
+//          GetOwner(this)->settings->mapping[12],
+//          GetOwner(this)->settings->mapping[13],
+//          GetOwner(this)->settings->mapping[14]);
     
     report360->buttons = new_buttons;
 }
@@ -555,7 +572,7 @@ IOReturn XboxOneControllerClass::setReport(IOMemoryDescriptor *report,IOHIDRepor
             rumble.rumbleMask = 0x0F;
             rumble.length = 0x80;
             
-            rumbleType = GetOwner(this)->xoneRumbleType;
+            rumbleType = GetOwner(this)->settings->xoneRumbleType;
             if (rumbleType == 0) // Default
             {
                 rumble.trigL = 0x00;

@@ -29,9 +29,8 @@
 #include "ChatPad.h"
 #include "Controller.h"
 
-#define kDriverSettingKey       "DeviceData"
-
-#define kIOSerialDeviceType   "Serial360Device"
+#define kDriverSettingKey "DeviceData"
+#define kIOSerialDeviceType "Serial360Device"
 
 OSDefineMetaClassAndStructors(Xbox360Peripheral, IOService)
 #define super IOService
@@ -223,76 +222,6 @@ void Xbox360Peripheral::ChatPadTimerAction(IOTimerEventSource *sender)
 	}
 }
 
-// Read the settings from the registry
-void Xbox360Peripheral::readSettings(void)
-{
-    OSBoolean *value = NULL;
-    OSNumber *number = NULL;
-    OSDictionary *dataDictionary = OSDynamicCast(OSDictionary, getProperty(kDriverSettingKey));
-    
-    if (dataDictionary == NULL) return;
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("InvertLeftX"));
-    if (value != NULL) invertLeftX = value->getValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("InvertLeftY"));
-    if (value != NULL) invertLeftY = value->getValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("InvertRightX"));
-    if (value != NULL) invertRightX = value->getValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("InvertRightY"));
-    if (value != NULL) invertRightY = value->getValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("DeadzoneLeft"));
-    if (number != NULL) deadzoneLeft = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("DeadzoneRight"));
-    if (number != NULL) deadzoneRight = number->unsigned32BitValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("RelativeLeft"));
-    if (value != NULL) relativeLeft = value->getValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("RelativeRight"));
-    if (value != NULL) relativeRight=value->getValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("DeadOffLeft"));
-    if (value != NULL) deadOffLeft = value->getValue();
-    value = OSDynamicCast(OSBoolean, dataDictionary->getObject("DeadOffRight"));
-    if (value != NULL) deadOffRight = value->getValue();
-//    number = OSDynamicCast(OSNumber, dataDictionary->getObject("ControllerType")); // No use currently.
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("XoneRumbleType"));
-    if (number != NULL) xoneRumbleType = number->unsigned8BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingUp"));
-    if (number != NULL) mapping[0] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingDown"));
-    if (number != NULL) mapping[1] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingLeft"));
-    if (number != NULL) mapping[2] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingRight"));
-    if (number != NULL) mapping[3] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingStart"));
-    if (number != NULL) mapping[4] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingBack"));
-    if (number != NULL) mapping[5] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingLSC"));
-    if (number != NULL) mapping[6] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingRSC"));
-    if (number != NULL) mapping[7] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingLB"));
-    if (number != NULL) mapping[8] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingRB"));
-    if (number != NULL) mapping[9] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingGuide"));
-    if (number != NULL) mapping[10] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingA"));
-    if (number != NULL) mapping[11] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingB"));
-    if (number != NULL) mapping[12] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingX"));
-    if (number != NULL) mapping[13] = number->unsigned32BitValue();
-    number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingY"));
-    if (number != NULL) mapping[14] = number->unsigned32BitValue();
-
-#if 0
-    IOLog("Xbox360Peripheral preferences loaded:\n  invertLeft X: %s, Y: %s\n   invertRight X: %s, Y:%s\n  deadzone Left: %d, Right: %d\n\n",
-            invertLeftX?"True":"False",invertLeftY?"True":"False",
-            invertRightX?"True":"False",invertRightY?"True":"False",
-            deadzoneLeft,deadzoneRight);
-#endif
-}
-
 // Initialise the extension
 bool Xbox360Peripheral::init(OSDictionary *propTable)
 {
@@ -309,25 +238,10 @@ bool Xbox360Peripheral::init(OSDictionary *propTable)
 	serialInBuffer = NULL;
 	serialTimer = NULL;
 	serialHandler = NULL;
+    
     // Default settings
-    invertLeftX=invertLeftY=false;
-    invertRightX=invertRightY=false;
-    deadzoneLeft=deadzoneRight=0;
-    relativeLeft=relativeRight=false;
-    deadOffLeft = false;
-    deadOffRight = false;
-    // Controller Specific
-    xoneRumbleType = 0;
-    // Bindings
-    for (int i = 0; i < 11; i++)
-    {
-        mapping[i] = i;
-    }
-    for (int i = 12; i < 16; i++)
-    {
-        mapping[i-1] = i;
-    }
-    // Done
+    settings = new ControllerSettings();
+
     return res;
 }
 
@@ -335,6 +249,7 @@ bool Xbox360Peripheral::init(OSDictionary *propTable)
 void Xbox360Peripheral::free(void)
 {
     IOLockFree(mainLock);
+    delete settings;
     super::free();
 }
 
@@ -693,159 +608,10 @@ IOReturn Xbox360Peripheral::message(UInt32 type,IOService *provider,void *argume
     }
 }
 
-// This returns the abs() value of a short, swapping it if necessary
-static inline XBox360_SShort getAbsolute(XBox360_SShort value)
-{
-    XBox360_SShort reverse;
-    
-#ifdef __LITTLE_ENDIAN__
-    reverse=value;
-#elif __BIG_ENDIAN__
-    reverse=((value&0xFF00)>>8)|((value&0x00FF)<<8);
-#else
-#error Unknown CPU byte order
-#endif
-    return (reverse<0)?~reverse:reverse;
-}
-
 // Adjusts the report for any settings speciified by the user
 void Xbox360Peripheral::fiddleReport(IOBufferMemoryDescriptor *buffer)
 {
-    XBOX360_IN_REPORT *report=(XBOX360_IN_REPORT*)buffer->getBytesNoCopy();
-    if(invertLeftX) report->left.x=~report->left.x;
-    if(!invertLeftY) report->left.y=~report->left.y;
-    if(invertRightX) report->right.x=~report->right.x;
-    if(!invertRightY) report->right.y=~report->right.y;
-    if(deadzoneLeft!=0) {
-        if(relativeLeft) {
-            if((getAbsolute(report->left.x)<deadzoneLeft)&&(getAbsolute(report->left.y)<deadzoneLeft)) {
-                report->left.x=0;
-                report->left.y=0;
-            }
-            else if(deadOffLeft) {
-                const UInt16 max16=32767;
-                float maxVal=max16-deadzoneLeft;
-                float valX=getAbsolute(report->left.x);
-                if (valX>deadzoneLeft) {
-                    if (report->left.x<0) {
-                        report->left.x=max16*(valX-deadzoneLeft)/maxVal;
-                        report->left.x=~report->left.x;
-                    } else {
-                        report->left.x=max16*(valX-deadzoneLeft)/maxVal;
-                    }
-                } else {
-                    report->left.x=0;
-                }
-                float valY=getAbsolute(report->left.y);
-                if (valY>deadzoneLeft) {
-                    if (report->left.y<0) {
-                        report->left.y=max16*(valY-deadzoneLeft)/maxVal;
-                        report->left.y=~report->left.y;
-                    } else {
-                        report->left.y=max16*(valY-deadzoneLeft)/maxVal;
-                    }
-                } else {
-                    report->left.y=0;
-                }
-            }
-        } else {
-            if(getAbsolute(report->left.x)<deadzoneLeft)
-                report->left.x=0;
-            else if (deadOffLeft)
-            {
-                const UInt16 max16=32767;
-                float maxVal=max16-deadzoneLeft;
-                if (report->left.x<0) {
-                    float valX=getAbsolute(report->left.x);
-                    report->left.x=max16*(valX-deadzoneLeft)/maxVal;
-                    report->left.x=~report->left.x;
-                } else {
-                    float valX=getAbsolute(report->left.x);
-                    report->left.x=max16*(valX-deadzoneLeft)/maxVal;
-                }
-            }
-            if(getAbsolute(report->left.y)<deadzoneLeft)
-                report->left.y=0;
-            else if (deadOffLeft)
-            {
-                const UInt16 max16=32767;
-                float maxVal = max16-deadzoneLeft;
-                if (report->left.y<0) {
-                    float valY=getAbsolute(report->left.y);
-                    report->left.y=max16*(valY-deadzoneLeft)/maxVal;
-                    report->left.y=~report->left.y;
-                } else {
-                    float valY=getAbsolute(report->left.y);
-                    report->left.y=max16*(valY-deadzoneLeft)/maxVal;
-                }
-            }
-        }
-    }
-    if(deadzoneRight!=0) {
-        if(relativeRight) {
-            if((getAbsolute(report->right.x)<deadzoneRight)&&(getAbsolute(report->right.y)<deadzoneRight)) {
-                report->right.x=0;
-                report->right.y=0;
-            }
-            else if(deadOffRight) {
-                const UInt16 max16=32767;
-                float maxVal=max16-deadzoneRight;
-                float valX=getAbsolute(report->right.x);
-                if (valX>deadzoneRight) {
-                    if (report->right.x<0) {
-                        report->right.x=max16*(valX-deadzoneRight)/maxVal;
-                        report->right.x=~report->right.x;
-                    } else {
-                        report->right.x=max16*(valX-deadzoneRight)/maxVal;
-                    }
-                } else {
-                    report->right.x = 0;
-                }
-                float valY=getAbsolute(report->right.y);
-                if (valY>deadzoneRight) {
-                    if (report->right.y<0) {
-                        report->right.y=max16*(valY-deadzoneRight)/maxVal;
-                        report->right.y=~report->right.y;
-                    } else {
-                        report->right.y=max16*(valY-deadzoneRight)/maxVal;
-                    }
-                } else {
-                    report->right.y = 0;
-                }
-            }
-        } else {
-            if(getAbsolute(report->right.x)<deadzoneRight)
-                report->right.x=0;
-            else if (deadOffRight)
-            {
-                const UInt16 max16=32767;
-                float maxVal=max16-deadzoneRight;
-                if (report->right.x<0) {
-                    float valX=getAbsolute(report->right.x);
-                    report->right.x=max16*(valX-deadzoneRight)/maxVal;
-                    report->right.x=~report->right.x;
-                } else {
-                    float valX=getAbsolute(report->right.x);
-                    report->right.x=max16*(valX-deadzoneRight)/maxVal;
-                }
-            }
-            if(getAbsolute(report->right.y)<deadzoneRight)
-                report->right.y=0;
-            else if (deadOffRight)
-            {
-                const UInt16 max16=32767;
-                float maxVal=max16-deadzoneRight;
-                if (report->right.y<0) {
-                    float valY=getAbsolute(report->right.y);
-                    report->right.y=max16*(valY-deadzoneRight)/maxVal;
-                    report->right.y=~report->right.y;
-                } else {
-                    float valY=getAbsolute(report->right.y);
-                    report->right.y=max16*(valY-deadzoneRight)/maxVal;
-                }
-            }
-        }
-    }
+    if (settings != NULL) settings->fiddleReport((XBOX360_IN_REPORT*)buffer->getBytesNoCopy());
 }
 
 // This forwards a completed read notification to a member function
@@ -946,7 +712,7 @@ void Xbox360Peripheral::SerialReadComplete(void *parameter, IOReturn status, UIn
 void Xbox360Peripheral::WriteComplete(void *parameter,IOReturn status,UInt32 bufferSizeRemaining)
 {
     IOMemoryDescriptor *memory=(IOMemoryDescriptor*)parameter;
-    if(status!=kIOReturnSuccess) {
+    if (status != kIOReturnSuccess) {
         IOLog("write - Error writing: 0x%.8x\n",status);
     }
     memory->release();
@@ -958,12 +724,12 @@ IOReturn Xbox360Peripheral::setProperties(OSObject *properties)
 {
     OSDictionary *dictionary;
     
-    dictionary=OSDynamicCast(OSDictionary,properties);
+    dictionary=OSDynamicCast(OSDictionary, properties);
     
-    if(dictionary!=NULL) {
+    if (dictionary != NULL) {
         dictionary->setObject(OSString::withCString("ControllerType"), OSNumber::withNumber(controllerType, 8));
-        setProperty(kDriverSettingKey,dictionary);
-        readSettings();
+        setProperty(kDriverSettingKey, dictionary);
+        if (settings != NULL) settings->readSettings(dictionary);
         return kIOReturnSuccess;
     } else return kIOReturnBadArgument;
 }

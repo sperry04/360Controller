@@ -36,6 +36,10 @@
 		3FE789AD1A70288F00FF4065 /* MyDeadZoneViewer.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FE789AB1A70288F00FF4065 /* MyDeadZoneViewer.m */; };
 		3FE789B01A70331C00FF4065 /* MyTrigger.h in Headers */ = {isa = PBXBuildFile; fileRef = 3FE789AE1A70331C00FF4065 /* MyTrigger.h */; };
 		3FE789B11A70331C00FF4065 /* MyTrigger.m in Sources */ = {isa = PBXBuildFile; fileRef = 3FE789AF1A70331C00FF4065 /* MyTrigger.m */; };
+		4A2EFF221AFD3FED00A33737 /* ControllerSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A2EFF201AFD3FED00A33737 /* ControllerSettings.cpp */; };
+		4A2EFF231AFD3FED00A33737 /* ControllerSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4A2EFF201AFD3FED00A33737 /* ControllerSettings.cpp */; };
+		4A2EFF241AFD3FED00A33737 /* ControllerSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A2EFF211AFD3FED00A33737 /* ControllerSettings.h */; };
+		4A2EFF251AFD3FED00A33737 /* ControllerSettings.h in Headers */ = {isa = PBXBuildFile; fileRef = 4A2EFF211AFD3FED00A33737 /* ControllerSettings.h */; };
 		551CDFF9196EEE76000869B6 /* Pref360ControlPref.xib in Resources */ = {isa = PBXBuildFile; fileRef = 551CDFFB196EEE76000869B6 /* Pref360ControlPref.xib */; };
 		553BDB44196DF3BA00D1F569 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 553BDB43196DF3BA00D1F569 /* IOKit.framework */; };
 		553BDB45196DF41500D1F569 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 553BDB43196DF3BA00D1F569 /* IOKit.framework */; };
@@ -215,6 +219,8 @@
 		3FE789AB1A70288F00FF4065 /* MyDeadZoneViewer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyDeadZoneViewer.m; sourceTree = "<group>"; };
 		3FE789AE1A70331C00FF4065 /* MyTrigger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTrigger.h; sourceTree = "<group>"; };
 		3FE789AF1A70331C00FF4065 /* MyTrigger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTrigger.m; sourceTree = "<group>"; };
+		4A2EFF201AFD3FED00A33737 /* ControllerSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ControllerSettings.cpp; sourceTree = "<group>"; };
+		4A2EFF211AFD3FED00A33737 /* ControllerSettings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerSettings.h; sourceTree = "<group>"; };
 		551B911F1A68BDB000EA6527 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/Pref360ControlPref.xib; sourceTree = "<group>"; };
 		551CDFFD196EF52F000869B6 /* Pref360Control_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Pref360Control_Prefix.pch; sourceTree = "<group>"; };
 		551CDFFF196EFD34000869B6 /* Install360Controller.pkgproj */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = Install360Controller.pkgproj; sourceTree = "<group>"; };
@@ -387,6 +393,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		4A2EFF1C1AFD3BBF00A33737 /* ControllerSettings */ = {
+			isa = PBXGroup;
+			children = (
+				4A2EFF211AFD3FED00A33737 /* ControllerSettings.h */,
+				4A2EFF201AFD3FED00A33737 /* ControllerSettings.cpp */,
+			);
+			path = ControllerSettings;
+			sourceTree = "<group>";
+		};
 		551CDFFE196EFD0A000869B6 /* Distribution */ = {
 			isa = PBXGroup;
 			children = (
@@ -471,6 +486,7 @@
 		55B636AB18C104DB00CE933D = {
 			isa = PBXGroup;
 			children = (
+				4A2EFF1C1AFD3BBF00A33737 /* ControllerSettings */,
 				55B6372C18C108D200CE933D /* Feedback360 */,
 				55B636EB18C1054F00CE933D /* 360Controller */,
 				55B637F618C10DA300CE933D /* Wireless360Controller */,
@@ -677,6 +693,7 @@
 				55B6375118C1098D00CE933D /* chatpadhid.h in Headers */,
 				55B6374F18C1098D00CE933D /* _60Controller.h in Headers */,
 				55B6375418C1098D00CE933D /* ControlStruct.h in Headers */,
+				4A2EFF241AFD3FED00A33737 /* ControllerSettings.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -703,6 +720,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				55B6380418C10DA300CE933D /* Wireless360Controller.h in Headers */,
+				4A2EFF251AFD3FED00A33737 /* ControllerSettings.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -870,7 +888,7 @@
 		55B636AC18C104DB00CE933D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0610;
+				LastUpgradeCheck = 0630;
 				ORGANIZATIONNAME = GitHub;
 			};
 			buildConfigurationList = 55B636AF18C104DB00CE933D /* Build configuration list for PBXProject "360 Driver" */;
@@ -978,6 +996,7 @@
 				55B6371718C105B800CE933D /* _60Controller.cpp in Sources */,
 				55B6371818C105B800CE933D /* ChatPad.cpp in Sources */,
 				55B6371A18C105B800CE933D /* Controller.cpp in Sources */,
+				4A2EFF221AFD3FED00A33737 /* ControllerSettings.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1022,6 +1041,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4A2EFF231AFD3FED00A33737 /* ControllerSettings.cpp in Sources */,
 				55B6380318C10DA300CE933D /* Wireless360Controller.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1308,7 +1328,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				EXPORTED_SYMBOLS_FILE = Feedback360/Feedback360.exp;
 				INFOPLIST_FILE = Feedback360/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Bundles";
@@ -1322,7 +1341,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
 				DEAD_CODE_STRIPPING = YES;
 				EXPORTED_SYMBOLS_FILE = Feedback360/Feedback360.exp;
 				INFOPLIST_FILE = Feedback360/Info.plist;

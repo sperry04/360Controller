@@ -346,6 +346,7 @@ static void callbackHandleDevice(void *param,io_iterator_t iterator)
     [_rightLinkedAlt setEnabled:enable];
     [_normalizeDeadzoneLeft setEnabled:enable];
     [_normalizeDeadzoneRight setEnabled:enable];
+    [_combinedTriggers setEnabled:enable];
     if (enable) { // If trying to enable, make sure its an Xbox One Controller
 //        if (controllerType == XboxOneController) // Ignore until settings are fixed (Issue #67
             [_xoneRumbleOptions setEnabled:enable];
@@ -670,6 +671,9 @@ static void callbackHandleDevice(void *param,io_iterator_t iterator)
                 NSNumber *num = (__bridge NSNumber *)intValue;
                 [MyWhole360ControllerMapper mapping][14] = [num intValue];
             } else NSLog(@"No value for BindingY\n");
+            if(CFDictionaryGetValueIfPresent(dict,CFSTR("CombinedTriggers"),(void*)&boolValue)) {
+                [_combinedTriggers setState:CFBooleanGetValue(boolValue)?NSOnState:NSOffState];
+            } else NSLog(@"No value for InvertRightX\n");
         } else NSLog(@"No settings found\n");
     }
     // Enable GUI components
@@ -908,6 +912,7 @@ static void callbackHandleDevice(void *param,io_iterator_t iterator)
                            @"RelativeRight": @((BOOL)([_rightLinked state]==NSOnState)),
                            @"DeadOffLeft": @((BOOL)([_normalizeDeadzoneLeft state]==NSOnState)),
                            @"DeadOffRight": @((BOOL)([_normalizeDeadzoneRight state]==NSOnState)),
+                           @"CombinedTriggers": @((BOOL)([_combinedTriggers state]==NSOnState)),
                            @"ControllerType": @((UInt8)(controllerType)),
                            @"XoneRumbleType": @((UInt8)([_xoneRumbleOptions indexOfSelectedItem])),
                            @"BindingUp": @((UInt8)([MyWhole360ControllerMapper mapping][0])),

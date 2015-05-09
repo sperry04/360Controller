@@ -24,6 +24,7 @@
 #define __WIRELESS360CONTROLLER_H__
 
 #include "../WirelessGamingReceiver/WirelessHIDDevice.h"
+#include "../ControllerSettings/ControllerSettings.h"
 
 class Wireless360Controller : public WirelessHIDDevice
 {
@@ -46,16 +47,11 @@ public:
     virtual OSString* newTransportString() const;
     virtual OSNumber* newVendorIDNumber() const;
 protected:
-    void readSettings(void);
     void receivedHIDupdate(unsigned char *data, int length);
+    virtual void free();
 
     // Settings
-    bool invertLeftX,invertLeftY;
-    bool invertRightX,invertRightY;
-    short deadzoneLeft,deadzoneRight;
-    bool relativeLeft,relativeRight;
-private:
-    void fiddleReport(unsigned char *data, int length);
+    ControllerSettings *settings;
 };
 
 #endif // __WIRELESS360CONTROLLER_H__

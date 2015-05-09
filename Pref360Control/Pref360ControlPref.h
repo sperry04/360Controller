@@ -54,6 +54,7 @@ typedef NS_ENUM(NSUInteger, ControllerType) {
 @property (weak) IBOutlet NSSlider *rightStickDeadzone;
 @property (weak) IBOutlet NSButton *rightStickInvertX;
 @property (weak) IBOutlet NSButton *rightStickInvertY;
+@property (weak) IBOutlet NSButton *combinedTriggers;
 @property (weak) IBOutlet DeviceLister *deviceLister;
 @property (weak) IBOutlet NSButton *powerOff;
 @property (weak) IBOutlet MyWhole360Controller *wholeController;

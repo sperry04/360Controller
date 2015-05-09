@@ -26,137 +26,27 @@
 #include "../360Controller/ControlStruct.h"
 #include "../360Controller/xbox360hid.h"
 
-#define COMBINED_TRIGGER_AXIS true
-
 #define kDriverSettingKey "DeviceData"
 
 OSDefineMetaClassAndStructors(Wireless360Controller, WirelessHIDDevice)
 #define super WirelessHIDDevice
 
-static inline XBox360_SShort getAbsolute(XBox360_SShort value)
-{
-    XBox360_SShort reverse;
-    
-#ifdef __LITTLE_ENDIAN__
-    reverse=value;
-#elif __BIG_ENDIAN__
-    reverse=((value&0xFF00)>>8)|((value&0x00FF)<<8);
-#else
-#error Unknown CPU byte order
-#endif
-    return (reverse<0)?~reverse:reverse;
-}
-
 bool Wireless360Controller::init(OSDictionary *propTable)
 {
-    bool res = super::init(propTable);
-    
-    // Default settings
-    invertLeftX = invertLeftY = false;
-    invertRightX = invertRightY = false;
-    deadzoneLeft = deadzoneRight = 0;
-    relativeLeft = relativeRight = false;
-    readSettings();
-    
-    // Done
+    bool res = super::init(propTable);    
+    settings = new ControllerSettings();
     return res;
 }
 
-// Read the settings from the registry
-void Wireless360Controller::readSettings(void)
+void Wireless360Controller::free()
 {
-    OSBoolean *value;
-    OSNumber *number;
-    OSDictionary *dataDictionary = OSDynamicCast(OSDictionary, getProperty(kDriverSettingKey));
-    
-    if(dataDictionary==NULL) return;
-    value=OSDynamicCast(OSBoolean,dataDictionary->getObject("InvertLeftX"));
-    if(value!=NULL) invertLeftX=value->getValue();
-    value=OSDynamicCast(OSBoolean,dataDictionary->getObject("InvertLeftY"));
-    if(value!=NULL) invertLeftY=value->getValue();
-    value=OSDynamicCast(OSBoolean,dataDictionary->getObject("InvertRightX"));
-    if(value!=NULL) invertRightX=value->getValue();
-    value=OSDynamicCast(OSBoolean,dataDictionary->getObject("InvertRightY"));
-    if(value!=NULL) invertRightY=value->getValue();
-    number=OSDynamicCast(OSNumber,dataDictionary->getObject("DeadzoneLeft"));
-    if(number!=NULL) deadzoneLeft=number->unsigned32BitValue();
-    number=OSDynamicCast(OSNumber,dataDictionary->getObject("DeadzoneRight"));
-    if(number!=NULL) deadzoneRight=number->unsigned32BitValue();
-    value=OSDynamicCast(OSBoolean,dataDictionary->getObject("RelativeLeft"));
-    if(value!=NULL) relativeLeft=value->getValue();
-    value=OSDynamicCast(OSBoolean,dataDictionary->getObject("RelativeRight"));
-    if(value!=NULL) relativeRight=value->getValue();
-#if 0
-    IOLog("Xbox360ControllerClass preferences loaded:\n  invertLeft X: %s, Y: %s\n   invertRight X: %s, Y:%s\n  deadzone Left: %d, Right: %d\n\n",
-            invertLeftX?"True":"False",invertLeftY?"True":"False",
-            invertRightX?"True":"False",invertRightY?"True":"False",
-            deadzoneLeft,deadzoneRight);
-#endif
-}
-
-// Adjusts the report for any settings specified by the user
-void Wireless360Controller::fiddleReport(unsigned char *data, int length)
-{
-    XBOX360_IN_REPORT *report = (XBOX360_IN_REPORT*)data;
-    
-    if (invertLeftX)
-        report->left.x = ~report->left.x;
-    if (!invertLeftY)
-        report->left.y = ~report->left.y;
-    if (invertRightX)
-        report->right.x = ~report->right.x;
-    if (!invertRightY)
-        report->right.y = ~report->right.y;
-        
-    if (deadzoneLeft != 0)
-    {
-        if (relativeLeft)
-        {
-            if ((getAbsolute(report->left.x) < deadzoneLeft) && (getAbsolute(report->left.y) < deadzoneLeft))
-            {
-                report->left.x = 0;
-                report->left.y = 0;
-            }
-        }
-        else
-        {
-            if (getAbsolute(report->left.x) < deadzoneLeft)
-                report->left.x = 0;
-            if (getAbsolute(report->left.y) < deadzoneLeft)
-                report->left.y = 0;
-        }
-    }
-    if (deadzoneRight != 0)
-    {
-        if (relativeRight)
-        {
-            if ((getAbsolute(report->right.x) < deadzoneRight) && (getAbsolute(report->right.y) < deadzoneRight))
-            {
-                report->right.x = 0;
-                report->right.y = 0;
-            }
-        }
-        else
-        {
-            if (getAbsolute(report->right.x) < deadzoneRight)
-                report->right.x = 0;
-            if (getAbsolute(report->right.y) < deadzoneRight)
-                report->right.y = 0;
-        }
-    }
-    
-    if (COMBINED_TRIGGER_AXIS) // TODO: make this a user setting in the UI
-    {
-        // set only the left trigger axis as a combined value, zero out the right trigger axis
-        const UInt8 trigCenter = UINT8_MAX / 2U;
-        report->trigL = trigCenter + ((report->trigR/2U + 1) - report->trigL/2U);
-        report->trigR = 0U;
-    }
+    delete settings;
+    super::free();
 }
 
 void Wireless360Controller::receivedHIDupdate(unsigned char *data, int length)
 {
-    fiddleReport(data, length);
+    settings->fiddleReport((XBOX360_IN_REPORT*)data);
     super::receivedHIDupdate(data, length);
 }
 
@@ -204,11 +94,11 @@ IOReturn Wireless360Controller::newReportDescriptor(IOMemoryDescriptor ** descri
 // Called by the userspace IORegistryEntrySetCFProperties function
 IOReturn Wireless360Controller::setProperties(OSObject *properties)
 {
-    OSDictionary *dictionary = OSDynamicCast(OSDictionary,properties);
+    OSDictionary *dictionary = OSDynamicCast(OSDictionary, properties);
     
-    if(dictionary!=NULL) {
-        setProperty(kDriverSettingKey,dictionary);
-        readSettings();
+    if (dictionary != NULL) {
+        setProperty(kDriverSettingKey, dictionary);
+        settings->readSettings(dictionary);
         return kIOReturnSuccess;
     } else return kIOReturnBadArgument;
 }
