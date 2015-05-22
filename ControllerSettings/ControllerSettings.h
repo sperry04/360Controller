@@ -15,10 +15,6 @@
 // class to encapsulate the reading/fiddling of settings shared by all controllers
 class ControllerSettings {
     
-protected:
-    
-    void logSettings(const char *message);
-    
 public:
     
     // constructor

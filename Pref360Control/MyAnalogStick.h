@@ -32,9 +32,10 @@
 @property (nonatomic) BOOL linked;
 @property (nonatomic) BOOL normalized;
 
-- (void)setPositionX:(int)positionX;
 - (void)setNormalized:(BOOL)isNormalized;
+- (void)setLinked:(BOOL)isLinked;
+- (void)setPositionX:(int)positionX;
 - (void)setPositionY:(int)positionY;
-- (void)setPositionX:(int)xPos y:(int)yPos;
+- (void)setPositionX:(int)xPos setPositionY:(int)yPos;
 
 @end

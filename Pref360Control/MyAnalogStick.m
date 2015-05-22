@@ -49,60 +49,23 @@
 
 - (void)setPositionX:(int)positionX
 {
-    x = positionX;
-    
-    if (normalized)
-    {
-        const UInt16 max16 = 32767;
-        float maxVal = max16 - deadzone;
-        
-        if (x > 0)
-            realX = (abs(x) * maxVal / max16) + deadzone + 1;
-        else if (x < 0)
-            realX = -((abs(x) * maxVal / max16) + deadzone + 1);
-        else // x == 0
-            realX = 0;
-    }
-    else
-    {
-        realX = 0;
-    }
-    
-    self.needsDisplay = YES;
+    [self setPositionX:positionX setPositionY:y];
 }
 
 - (void)setPositionY:(int)positionY
 {
-    y = positionY;
-    
-    if (normalized)
-    {
-        const UInt16 max16 = 32767;
-        float maxVal = max16 - deadzone;
-        
-        if (y > 0)
-            realY = (abs(y) * maxVal / max16) + deadzone + 1;
-        else if (y < 0)
-            realY = -((abs(y) * maxVal / max16) + deadzone + 1);
-        else // y == 0
-            realY = 0;
-    }
-    else
-    {
-        realY = 0;
-    }
-    
-    self.needsDisplay = YES;
+    [self setPositionX:x setPositionY:positionY];
 }
 
 - (void)setNormalized:(BOOL)isNormalized
 {
     normalized = isNormalized;
+    self.needsDisplay = YES;
 }
 
-- (void)setLinked:(BOOL)alinked
+- (void)setLinked:(BOOL)isLinked
 {
-    linked = alinked;
+    linked = isLinked;
     self.needsDisplay = YES;
 }
 
@@ -170,13 +133,37 @@
     NSRectFill(posRect);
 }
 
-- (void)setPositionX:(int)xPos y:(int)yPos
+- (void)setPositionX:(int)xPos setPositionY:(int)yPos
 {
-    // This does not trigger the key-value observer.
     x = xPos;
-    // This does.
-    // Done so the setNeedsDisplay: is only called once
-    self.positionY = yPos;
+    y = yPos;
+    
+    if (normalized) // TODO: handle linked flag
+    {
+        const UInt16 max16 = 32767;
+        float maxVal = max16 - deadzone;
+        
+        if (x > 0)
+            realX = (abs(x) * maxVal / max16) + deadzone + 1;
+        else if (x < 0)
+            realX = -((abs(x) * maxVal / max16) + deadzone + 1);
+        else // x == 0
+            realX = 0;
+        
+        if (y > 0)
+            realY = (abs(y) * maxVal / max16) + deadzone + 1;
+        else if (y < 0)
+            realY = -((abs(y) * maxVal / max16) + deadzone + 1);
+        else // y == 0
+            realY = 0;
+    }
+    else
+    {
+        realX = 0;
+        realY = 0;
+    }
+
+    self.needsDisplay = YES;
 }
 
 @end

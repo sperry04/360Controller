@@ -10,7 +10,8 @@
 #include <IOKit/hid/IOHIDDevice.h>
 #include "ControllerSettings.h"
 
-#define LOGGING_ENABLED 1
+// TODO: why doesn't logging work when LOGGING_ENABLED is set to true?
+#define LOGGING_ENABLED false
 
 // constructor
 ControllerSettings::ControllerSettings(void) {
@@ -53,15 +54,15 @@ void ControllerSettings::init(void) {
     xoneRumbleType = 0;            // the type of rumble for Xbone controllers
 }
 
-// writes the current settings to log if loggin is enabled
-inline void ControllerSettings::logSettings(const char *message) {
+// writes the settings to log if logging is enabled
+static inline void logSettings(const char *message, ControllerSettings *settings) {
 #if (LOGGING_ENABLED)
     IOLog("360Driver: %s - InvertLeft X[%s] Y[%s], InvertRight X[%s] Y[%s], CombinedTriggers[%s], Deadzone Left[%d%s%s] Right[%d%s%s]",
           message,
-          invertLeftX ? "T" : "F", invertLeftY ? "T" : "F", invertRightX ? "T" : "F", invertRightY ? "T" : "F",
-          combinedTriggers ? "T" : "F",
-          deadzoneLeft, linkedLeft ? "-linked" : "", normalizedLeft ? "-normalized" : "",
-          deadzoneRight, linkedRight ? "-linked" : "", normalizedRight ? "-normalized" : "");
+          settings->invertLeftX ? "T" : "F", settings->invertLeftY ? "T" : "F", settings->invertRightX ? "T" : "F", settings->invertRightY ? "T" : "F",
+          settings->combinedTriggers ? "T" : "F",
+          settings->deadzoneLeft, settings->linkedLeft ? "-linked" : "", settings->normalizedLeft ? "-normalized" : "",
+          settings->deadzoneRight, settings->linkedRight ? "-linked" : "", settings->normalizedRight ? "-normalized" : "");
 #endif
 }
 
@@ -80,7 +81,7 @@ static inline void logReport(const char *message, XBOX360_IN_REPORT *report) {
 void ControllerSettings::readSettings(OSDictionary *dataDictionary) {
 
     if (dataDictionary == NULL) {
-        logSettings("Failed to load Controller Settings, using defaults");
+        logSettings("Failed to load Controller Settings, using defaults", this);
         return;
     }
 
@@ -154,7 +155,7 @@ void ControllerSettings::readSettings(OSDictionary *dataDictionary) {
     number = OSDynamicCast(OSNumber, dataDictionary->getObject("BindingY"));
     if (number != NULL) mapping[14] = number->unsigned32BitValue();
     
-    logSettings("Controller Settings loaded");
+    logSettings("Controller Settings loaded", this);
 }
 
 // This returns the abs() value of a short, swapping it if necessary
@@ -174,38 +175,33 @@ static inline XBox360_SShort getAbsolute(XBox360_SShort value)
 }
 
 // check a single axis against the deadzone settings and return the fiddled value
-static inline UInt16 processDeadzone(UInt16 inputValue, short deadzone, bool normalized, bool linked, UInt16 linkedValue) {
-    UInt16 rval = inputValue;
+static inline XBox360_SShort processDeadzone(XBox360_SShort inputValue, short deadzone, bool normalized, bool linked, XBox360_SShort linkedValue) {
+    
+    XBox360_SShort rval = inputValue;
     
     // if there is a deadzone defined
     if (deadzone > 0) {
         
-        // if the horz and vert deadzones are linked
-        if (linked) {
-            // both the input value and the linked value from the other axis must be outside the zone
-            if ((getAbsolute(inputValue) < deadzone) && (getAbsolute(linkedValue) < deadzone)) {
-                return 0; // both axis values were not outside the deadzone
-            }
-        } else { // the horz and vert deadzones are not linked
-            // just the input value must be outside the deadzone
-            if (getAbsolute(inputValue) < deadzone) {
-                // the input value was not outside the deadzone
-                return 0;
-            }
+        XBox360_SShort absValue = getAbsolute(inputValue);
+        
+        // if the input axis is inside the deadzone, and we're linked and the linked value is inside the deadzone
+        if ((absValue < deadzone) && (linked && (getAbsolute(linkedValue) < deadzone))) { // TODO: this is wrong, my old code was better
+            // we're inside the deadzone
+            return 0;
         }
         
-        // at this point we know the input value is not clipped by the deadzone,
-        // now to normalize the output value if necessary
+        // we know we're outside the deadzone, normalize the output if necessary
         if (normalized) {
+            
             const UInt16 max16 = 32767;
             float maxVal = (float)(max16 - deadzone);
             
             // linearly scale the rval between the deadzone and max value
-            rval = max16 * (getAbsolute(inputValue) - deadzone) / maxVal;
+            rval = max16 * (absValue - deadzone) / maxVal;
             
             // fix the sign lost by the getAbsolute() call
             if (inputValue < 0) {
-                rval = -rval;
+                rval = ~rval;
             }
         }
     }
@@ -240,7 +236,6 @@ void ControllerSettings::fiddleReport(XBOX360_IN_REPORT *report) {
     if (combinedTriggers) {
         // set only the left trigger axis as a combined value, zero out the right trigger axis
         const UInt8 trigCenter = UINT8_MAX / 2U;
-//        report->trigL = trigCenter + ((report->trigR / 2U + 1) - report->trigL / 2U);
         report->trigL = trigCenter + ((report->trigR / 2U) - (report->trigL / 2U));
         report->trigR = 0U;
     }

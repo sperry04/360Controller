@@ -91,6 +91,10 @@ typedef NS_ENUM(NSUInteger, ControllerType) {
 @property (weak) IBOutlet NSButton *rightStickInvertYAlt;
 @property (weak) IBOutlet NSButton *normalizeDeadzoneLeft;
 @property (weak) IBOutlet NSButton *normalizeDeadzoneRight;
+@property (weak) IBOutlet NSTextField *leftXLabel;
+@property (weak) IBOutlet NSTextField *leftYLabel;
+@property (weak) IBOutlet NSTextField *rightXLabel;
+@property (weak) IBOutlet NSTextField *rightYLabel;
 
 // About Tab
 /* put About Tab's @properties here */

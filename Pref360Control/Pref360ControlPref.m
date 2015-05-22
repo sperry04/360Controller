@@ -174,21 +174,25 @@ static void callbackHandleDevice(void *param,io_iterator_t iterator)
         case 0:
             [_wholeController setLeftStickXPos:value];
             [_leftStickAnalog setPositionX:value];
+            [_leftXLabel setStringValue:[NSString stringWithFormat:@"X: %d", value]];
             break;
             
         case 1:
             [_wholeController setLeftStickYPos:value];
             [_leftStickAnalog setPositionY:value];
+            [_leftYLabel setStringValue:[NSString stringWithFormat:@"Y: %d", value]];
             break;
             
         case 2:
             [_wholeController setRightStickXPos:value];
             [_rightStickAnalog setPositionX:value];
+            [_rightXLabel setStringValue:[NSString stringWithFormat:@"X: %d", value]];
             break;
             
         case 3:
             [_wholeController setRightStickYPos:value];
             [_rightStickAnalog setPositionY:value];
+            [_rightYLabel setStringValue:[NSString stringWithFormat:@"Y: %d", value]];
             break;
             
         case 4:
@@ -601,6 +605,9 @@ static void callbackHandleDevice(void *param,io_iterator_t iterator)
                 [_rightDeadZone setVal:i];
                 [_rightStickAnalog setDeadzone:i];
             } else NSLog(@"No value for DeadzoneRight\n");
+            if(CFDictionaryGetValueIfPresent(dict,CFSTR("CombinedTriggers"),(void*)&boolValue)) {
+                [_combinedTriggers setState:CFBooleanGetValue(boolValue)?NSOnState:NSOffState];
+            } else NSLog(@"No value for CombinedTriggers\n");
             
             if(CFDictionaryGetValueIfPresent(dict,CFSTR("ControllerType"),(void*)&intValue)) {
                 NSNumber *num = (__bridge NSNumber *)intValue;
@@ -671,9 +678,6 @@ static void callbackHandleDevice(void *param,io_iterator_t iterator)
                 NSNumber *num = (__bridge NSNumber *)intValue;
                 [MyWhole360ControllerMapper mapping][14] = [num intValue];
             } else NSLog(@"No value for BindingY\n");
-            if(CFDictionaryGetValueIfPresent(dict,CFSTR("CombinedTriggers"),(void*)&boolValue)) {
-                [_combinedTriggers setState:CFBooleanGetValue(boolValue)?NSOnState:NSOffState];
-            } else NSLog(@"No value for InvertRightX\n");
         } else NSLog(@"No settings found\n");
     }
     // Enable GUI components
